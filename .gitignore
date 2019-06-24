@@ -1,0 +1,8 @@
+# Webstorm Settings directory
+.idea/
+
+# Modules
+node_modules/
+
+# Vulnerabilities
+.env
