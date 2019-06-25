@@ -29,6 +29,7 @@
     "mysql": "^2.17.1",
     "path": "^0.12.7",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.4",
+    "xml-js": "^1.6.11"
   }
 }

@@ -1,5 +1,6 @@
 const rp=require('request-promise').defaults({jar:true})
 const cheerio=require('cheerio')
+const convert=require('xml-js')
 
 exports.Everytime=(req,res)=>{
     const etId=req.body.etId
@@ -34,6 +35,12 @@ exports.Everytime=(req,res)=>{
                 simple:false,
             }
             const loginRes = await rp.post(option)
+            if (loginRes.statusCode!==302){
+                return Promise.reject({
+                    code:'everytime_login_error',
+                    message:'Fail to login everytime, Check your ID or password'
+                })
+            }
             cookie=loginRes.headers['set-cookie'][0]
             return Promise.resolve()
         }
@@ -53,7 +60,6 @@ exports.Everytime=(req,res)=>{
                 followAllRedirects:true,
             }
             const timetableListBody=await rp.get(option)
-            console.log(timetableListBody)
             return Promise.resolve(timetableListBody)
         }
         catch (e) {
@@ -70,7 +76,6 @@ exports.Everytime=(req,res)=>{
                     tableId=$(tables[i]).attr('id')
                 }
             }
-            console.log(tableId)
             if(!tableId){
                 return Promise.reject({
                     code:'no_timetable',
@@ -85,20 +90,23 @@ exports.Everytime=(req,res)=>{
                 },
             }
             const timetableBody=await rp.post(option)
-            console.log(timetableBody)
-            res.end(timetableBody)
-            return Promise.resolve()
+            return Promise.resolve(timetableBody)
         }
         catch (e) {
             return Promise.reject(e)
         }
     }
+    const MakeJSON=(xmlContent)=>{
+        const jsonContent = convert.xml2json(xmlContent,{compact:true, spaces:4})
+        return Promise.resolve(jsonContent)
+    }
     DataCheck()
         .then(Login)
         .then(GetTimetableList)
         .then(GetTimetable)
-        .then(()=>{
-            res.status(200).json({message:'Complete getting timetable'})
+        .then(MakeJSON)
+        .then((timetableResult)=>{
+            res.status(200).json(JSON.parse(timetableResult))
         })
         .catch((err)=>{
             res.status(500).json(err)
