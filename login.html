@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login Page</title>
+    </head>
+    <body>
+        <h1>Login</h1>
+        <hr />
+        <form method="POST">
+            <table>
+                <tr>
+                    <input type="radio" name="status" value="student"/>학생
+                    <input type="radio" name="status" value="faculty"/>교원
+                </tr>
+                <tr>
+                    <td><label>UserID</label></td>
+                    <td><input type="text" name="userid"></td>
+                </tr>
+                <tr>
+                    <td><label>Password</label></td>
+                    <td><input type="password" name="password"></td>
+                </tr>
+            </table>
+            <input type="submit" value="confirm" name="">
+        </form>
+        <p><a href="/">HOME</a></p>
+        <p><a href="/signup">Sign Up</a></p>
+    </body>
+</html>
+

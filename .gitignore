@@ -1,2 +1,5 @@
 # NPM Modules
 node_modules
+
+# Database Connection Information
+.env
