@@ -1,5 +1,8 @@
-# NPM Modules
-node_modules
+# Webstorm Settings directory
+.idea/
 
-# Database Connection Information
+# Modules
+node_modules/
+
+# Vulnerabilities
 .env
