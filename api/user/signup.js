@@ -7,7 +7,6 @@ exports.Signup = (req, res) => {
     const name = req.body.name
     const userId = req.body.userid
     const password = req.body.password
-    console.log(status,numId,name,userId,password)
 
     const DataCheck=()=>{
         return new Promise((resolve, reject)=>{
@@ -60,7 +59,6 @@ exports.Signup = (req, res) => {
             if (err)
                 throw err
             let salt = buf.toString('base64')
-            console.log(Number(process.env.CRYPTO_ITERATION))
             let key=crypto.pbkdf2Sync(password, salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512')
             let derivedKey=key.toString('base64');
             const doCreate=async ()=>{

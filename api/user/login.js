@@ -52,7 +52,6 @@ exports.Login = (req, res) => {
 
     const PWCheck=(rows)=>{
         let user = rows[0]
-        console.log(Number(process.env.CRYPTO_ITERATION))
         crypto.pbkdf2(password, user.salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, derivedKey)=>{
             if (err)
                 throw err
