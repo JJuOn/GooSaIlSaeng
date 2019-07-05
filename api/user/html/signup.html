@@ -7,11 +7,11 @@
     <body>
         <h1>Sign Up</h1>
         <hr />
-        <form method="POST">
+        <form action="/api/user/signup_process" method="POST">
             <table>
                 <tr>
-                    <input type="radio" name="status" value="student"/>학생
-                    <input type="radio" name="status" value="faculty"/>교원
+                    <input type="radio" name="status" value="Student"/>학생
+                    <input type="radio" name="status" value="Faculty"/>교원
                 </tr>
                 <tr>
                     <td><label>학번/사번</label></td>
@@ -33,6 +33,6 @@
             <input type="submit" value="confirm" name="">
         </form>
         <p><a href="/">HOME</a></p>
-        <p><a href="/login">Login</a></p>
+        <p><a href="/html/login.html">Login</a></p>
     </body>
 </html>
