@@ -6,12 +6,12 @@
     </head>
     <body>
         <h1>Login</h1>
-        <hr />
-        <form action="/api/user/login_process" method="POST">
+        <hr>
+        <form action="/api/user/login" method="POST">
             <table>
                 <tr>
-                    <input type="radio" name="status" value="Student"/>학생
-                    <input type="radio" name="status" value="Faculty"/>교원
+                    <input type="radio" name="status" value="Student">학생
+                    <input type="radio" name="status" value="Faculty">교원
                 </tr>
                 <tr>
                     <td><label>UserID</label></td>
@@ -22,10 +22,10 @@
                     <td><input type="password" name="password"></td>
                 </tr>
             </table>
-            <input type="submit" value="confirm" name="">
+            <input type="submit" value="confirm">
         </form>
         <p><a href="/">HOME</a></p>
-        <p><a href="/html/signup.html">Sign Up</a></p>
+        <p><a href="/signup.html">Sign Up</a></p>
     </body>
 </html>
 
