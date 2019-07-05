@@ -98,7 +98,8 @@ exports.Everytime=(req,res)=>{
     }
     const MakeJSON=(xmlContent)=>{
         const jsonContent = convert.xml2json(xmlContent,{compact:true, spaces:4})
-        return Promise.resolve(jsonContent)
+        const parsed=JSON.parse(jsonContent)
+        return Promise.resolve(parsed)
     }
     DataCheck()
         .then(Login)
@@ -106,7 +107,7 @@ exports.Everytime=(req,res)=>{
         .then(GetTimetable)
         .then(MakeJSON)
         .then((timetableResult)=>{
-            res.status(200).json(JSON.parse(timetableResult))
+            res.status(200).json(timetableResult)
         })
         .catch((err)=>{
             res.status(500).json(err)

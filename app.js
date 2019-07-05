@@ -24,6 +24,7 @@ app.use(session({
     resave:false,
     saveUninitialized:true
 }))
+
 app.use('/api',require('./api'))
 
 app.listen(process.env.SERVER_PORT || 3000, ()=>{
