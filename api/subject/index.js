@@ -1,7 +1,7 @@
 const express=require('express')
 const router=express.Router()
+const setAll=require('./setAll')
 
-router.use('/user', require('./user'))
-router.use('/subject', require('./subject'))
+router.post('/setall', setAll.SetAll)
 
 module.exports=router
