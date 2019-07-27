@@ -24,7 +24,7 @@ exports.Login = (req, res) => {
         try{
             const connection = await pool.getConnection(async conn => conn)
             try{
-                const [rows] = await connection.query(`SELECT * FROM ${status} where UserId=?`,[userId])
+                const [rows] = await connection.query(`SELECT * FROM USER WHERE UserId=?`,[userId])
                 connection.release()
                 if(!rows[0]){
                     return Promise.reject({

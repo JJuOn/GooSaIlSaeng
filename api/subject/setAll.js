@@ -132,7 +132,6 @@ exports.SetAll=(req,res)=>{
                 }
             }
         }
-        console.log(ids)
         return Promise.resolve(ids)
     }
     const GetSubjects=async (ids)=>{
@@ -156,15 +155,20 @@ exports.SetAll=(req,res)=>{
                     else{
                         for(let j=0;j<subjects.length;j++){
                             const timeplaces=$(subjects[j]).find('timeplace')
-                            for(let k=0;k<timeplaces.length;k++){
-                                result.push({
-                                    SubCode:$(subjects[j]).attr('code'),
-                                    SubName:$(subjects[j]).attr('name'),
-                                    Day:$(timeplaces[k]).attr('day'),
-                                    BeginTime:$(timeplaces[k]).attr('start'),
-                                    EndTime:$(timeplaces[k]).attr('end'),
-                                    Room:$(timeplaces[k]).attr('place')
-                                })
+                            const professor=$(subjects[j]).attr('professor')
+                            const professorArr=professor.split('/')
+                            for (let l=0;l<professorArr.length;l++){
+                                for(let k=0;k<timeplaces.length;k++){
+                                    result.push({
+                                        SubCode:$(subjects[j]).attr('code'),
+                                        SubName:$(subjects[j]).attr('name'),
+                                        Day:$(timeplaces[k]).attr('day'),
+                                        BeginTime:$(timeplaces[k]).attr('start'),
+                                        EndTime:$(timeplaces[k]).attr('end'),
+                                        Room:$(timeplaces[k]).attr('place'),
+                                        Professor:professorArr[l].trim()
+                                    })
+                                }
                             }
                         }
                         startNum+=50
@@ -178,13 +182,35 @@ exports.SetAll=(req,res)=>{
         }
         return Promise.resolve(result)
     }
+    const Create=async (result)=>{
+
+        try{
+            const connection=await pool.getConnection(async conn=>conn)
+            try{
+                for(let i=0;i<result.length;i++){
+                    const temp=await connection.query(`INSERT INTO SUBJECT (CODE,NAME,DAY,BEGINTIME,ENDTIME,ROOM,PROFESSOR,YEAR,SEMESTER) VALUES (?,?,?,?,?,?,?,?,?)`, [result[i].SubCode,result[i].SubName,result[i].Day,result[i].BeginTime,result[i].EndTime,result[i].Room,result[i].Professor,'2019','2'])
+                }
+                    connection.release()
+            }
+            catch (err){
+                console.error(err)
+                return Promise.reject(err)
+            }
+        }
+        catch (err) {
+            console.error(err)
+            return Promise.reject(err)
+        }
+        return Promise.resolve()
+    }
     Login()
         .then(GetMajorList)
         .then(MakeMajorTree)
         .then(BeautifyTree)
         .then(GetSubjects)
-        .then((tree)=>{
-            res.status(200).json(tree)
+        .then(Create)
+        .then(()=>{
+            res.status(200).end("All Done.")
         })
         .catch((err)=>{
             console.error(err);
