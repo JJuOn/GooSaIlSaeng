@@ -26,7 +26,7 @@ exports.Signup = (req, res) => {
         try{
             const connection=await pool.getConnection(async conn => conn)
             try{
-                const [rows]=await connection.query(`SELECT * FROM ${status} WHERE NUMID=? || USERID=?`,[numId,userId])
+                const [rows]=await connection.query(`SELECT * FROM USER WHERE NUMID=? || USERID=?`,[numId,userId])
                 connection.release()
                 if(rows[0]){
                     return Promise.reject({
@@ -65,7 +65,7 @@ exports.Signup = (req, res) => {
                 try{
                     const connection=await pool.getConnection(async conn=>conn)
                     try{
-                        const result = await connection.query(`INSERT INTO ${status} (NUMID,NAME,USERID,PASSWORD,CREATED,SALT) VALUES (?,?,?,?,NOW(),?)`,[numId,name,userId,derivedKey,salt])
+                        const result = await connection.query(`INSERT INTO USER (NUMID,NAME,USERID,PASSWORD,CREATED,SALT,STATUS) VALUES (?,?,?,?,NOW(),?,?)`,[numId,name,userId,derivedKey,salt,status])
                         connection.release()
                         return Promise.resolve()
                     }
@@ -91,7 +91,7 @@ exports.Signup = (req, res) => {
         .then(UserCheck)
         .then(Create)
         .then(()=>{
-            res.status(200).json({userId:userId})
+            res.redirect('/index.html')
         })
         .catch((err)=>{
             console.log(err)

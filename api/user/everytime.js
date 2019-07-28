@@ -1,10 +1,11 @@
 const rp=require('request-promise').defaults({jar:true})
 const cheerio=require('cheerio')
-const convert=require('xml-js')
+const pool=require('../../pool')
 
 exports.Everytime=(req,res)=>{
     const etId=req.body.etId
     const etPassword=req.body.etPassword
+    let id
     let cookie
     const DataCheck=()=>{
         return new Promise((resolve,reject)=>{
@@ -16,6 +17,26 @@ exports.Everytime=(req,res)=>{
             }
             else resolve()
         })
+    }
+    const GetId=async ()=>{
+        try{
+            const connection=await pool.getConnection(async conn=>conn)
+            try{
+                const [users] = await connection.query(`SELECT * FROM USER WHERE (USERID='${req.session.sid}')`)
+                //console.log(users)
+                connection.release()
+                id= users[0].id
+                return Promise.resolve()
+            }
+            catch (e) {
+                console.error(e)
+                return Promise.reject(e)
+            }
+        }
+        catch (e) {
+            console.error(e)
+            return Promise.reject(e)
+        }
     }
     const Login=async ()=>{
         try{
@@ -51,7 +72,7 @@ exports.Everytime=(req,res)=>{
     const GetTimetableList=async ()=>{
         try{
             const option={
-                uri:'http://everytime.kr/find/timetable/table/list/semester?year=2019&semester=1',
+                uri:'http://everytime.kr/find/timetable/table/list/semester?year=2019&semester=2',
                 headers:{
                     cookie:cookie,
                     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
@@ -96,18 +117,61 @@ exports.Everytime=(req,res)=>{
             return Promise.reject(e)
         }
     }
-    const MakeJSON=(xmlContent)=>{
-        const jsonContent = convert.xml2json(xmlContent,{compact:true, spaces:4})
-        const parsed=JSON.parse(jsonContent)
-        return Promise.resolve(parsed)
+    const Update=async (timetableBody)=>{
+        let results=[]
+        const $=cheerio.load(timetableBody,{xmlMode:true})
+        const table=$('response').find('table')
+        const subjects=$(table[0]).find('subject')
+        for(let i=0;i<subjects.length;i++){
+            const code=$(subjects[i]).children('internal').attr('value')
+            const name=$(subjects[i]).children('name').attr('value')
+            const time=$(subjects[i]).children('time').find('data')
+            for(let j=0;j<time.length;j++){
+                const day=$(time[j]).attr('day')
+                const startTime=$(time[j]).attr('starttime')
+                const endTime=$(time[j]).attr('endtime')
+                const place=$(time[j]).attr('place')
+                results.push({
+                    code:code,
+                    name:name,
+                    day:day,
+                    startTime:startTime,
+                    endTime:endTime,
+                    place:place,
+                    owner:id,
+                })
+            }
+        }
+        console.log(results)
+        try{
+            const connection=await pool.getConnection(async conn=>conn)
+            try{
+                for(let i=0;i<results.length;i++){
+                    const temp=await connection.query(`INSERT INTO SCHEDULE (CODE,NAME,DAY,BEGINTIME,ENDTIME,PLACE,OWNER,YEAR,SEMESTER,ISEXAM,ISREPEAT) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,[results[i].code,results[i].name,results[i].day,results[i].startTime,results[i].endTime,results[i].place,results[i].owner,'2019','2','0','1'])
+                    console.log(temp)
+                }
+                connection.release()
+                return Promise.resolve()
+            }
+            catch (e) {
+                console.error(e)
+                return Promise.reject(e)
+            }
+        }
+        catch (e) {
+            console.error(e)
+            return Promise.reject(e)
+        }
     }
+
     DataCheck()
+        .then(GetId)
         .then(Login)
         .then(GetTimetableList)
         .then(GetTimetable)
-        .then(MakeJSON)
-        .then((timetableResult)=>{
-            res.status(200).json(timetableResult)
+        .then(Update)
+        .then(()=>{
+            res.status(200).end('All Done')
         })
         .catch((err)=>{
             res.status(500).json(err)
