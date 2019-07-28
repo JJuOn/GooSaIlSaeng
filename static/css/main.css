@@ -1,0 +1,55 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F4F6F8;
+}
+
+.btn {
+    width: 11em;
+    background-color: #26336A;
+    border: none;
+    color: #fff;
+    padding: 0.5em 0;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5em;
+    margin: 15px;
+    cursor: pointer;
+}
+.btn:hover{
+    background-color: rgb(54, 75, 170);
+    color: white;
+}
+
+header {
+    background-color: #26336A;
+    width: 100%;
+    top: 0px;
+    height: 3em;
+    z-index: 1;
+}
+
+.container {
+    text-align: center;
+}
+
+.row {
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.logo {
+    width: 10em;
+    margin-top: 20px;
+}
+
+.sign-box {
+    box-shadow:3px 3px 3px 3px gray;
+    background-color: white;
+    width: 40em;
+    margin:0 auto;
+    border-radius: 50px;
+    margin: 30px;
+    padding: 30px;
+}

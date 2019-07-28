@@ -1,0 +1,98 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #F4F6F8;
+}
+
+.btn-login {
+    width: 5em;
+    background-color: #26336A;
+    border: none;
+    color: #fff;
+    padding: 0.5em 0;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5em;
+    margin: 30px;
+    cursor: pointer;
+}
+
+.btn-login:hover{
+    background-color: rgb(54, 75, 170);
+    color: white;
+}
+.btn-signin {
+    width: 7em;
+    background-color: #26336A;
+    border: none;
+    color: #fff;
+    padding: 0.5em 0;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5em;
+    margin: 30px;
+    cursor: pointer;
+}
+
+.btn-signin:hover{
+    background-color: rgb(54, 75, 170);
+    color: white;
+}
+
+.btn-login-et {
+    width: 5em;
+    background-color: rgb(209, 20, 20);
+    border: none;
+    color: #fff;
+    padding: 0.5em 0;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5em;
+    margin: 30px;
+    cursor: pointer;
+}
+
+.btn-login-et:hover{
+    background-color: rgb(156, 35, 35);
+    color: white;
+}
+
+header {
+    background-color: #26336A;
+    width: 100%;
+    top: 0px;
+    height: 3em;
+    z-index: 1;
+}
+.form-text{
+    float: left;
+}
+.container {
+    text-align: center;
+}
+
+.row {
+    margin: 0 auto;
+    display: inline-block;
+}
+.form-check label{
+    font-size: 20px;
+}
+.logo {
+    width: 5em;
+    margin-bottom: 20px;
+}
+
+.sign-box {
+    box-shadow:3px 3px 3px 3px gray;
+    background-color: white;
+    padding: 2.5em 10em;
+    width: 50em;
+    margin:0 auto;
+    border-radius: 50px;
+    margin: 30px;
+}
+.btn-group{
+    margin-bottom: 15px;
+}
