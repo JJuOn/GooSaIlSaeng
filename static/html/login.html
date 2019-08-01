@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../css/login.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+
+            <div class="sign-box">
+                    <img class='logo' src="../img/logo_rec.png" alt="">
+                <form action="/api/user/login" method="POST">
+                    
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="options" value="Student" autocomplete="off" checked>학생
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="options" value="Faculty" autocomplete="off">교원
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="userid" placeholder="ID">
+                    </div>
+                    <div class="form-group">
+
+                        <input type="password" class="form-control" name="password" placeholder="Password">
+                    </div>
+                    <label>
+                        <input class="btn-login" type="submit" value="로그인">
+                    </label>
+                </form>
+
+            </div>
+            <p><a href="./signup.html">아직 계정이 없으신가요? 회원가입</a></p>
+            <p><a href="/">HOME</a></p>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+</body>
+
+</html>

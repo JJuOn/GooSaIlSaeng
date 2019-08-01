@@ -1,12 +1,5 @@
 const crypto = require('crypto')
-const mysql = require('mysql')
-const db = mysql.createConnection({
-    host : process.env.DB_HOST,
-    user : process.env.DB_USER,
-    password : process.env.DB_PASSWORD,
-    database : process.env.DB_DATABASE,
-})
-db.connect()
+const pool=require('../../pool')
 
 exports.Signup = (req, res) => {
     const status = req.body.status
@@ -15,63 +8,93 @@ exports.Signup = (req, res) => {
     const userId = req.body.userid
     const password = req.body.password
 
-    db.query(`SELECT * FROM ${status} where NumId=? || UserId=?`, [numId, userId], (err, results) => {
-        if (err) throw err;
-        if (results[0]) {       // 이미 존재하는 학번/사번 또는 아이디
-            res.writeHead('200', { 'Content-Type' : 'text/html; charset=utf8'})
-            res.write(`입력하신 학번/사번 또는 아이디로 가입된 계정이 이미 존재합니다.`)
-            res.write(`<div><p><a href="/login">Login</a></p></div>`)
-            res.write(`<div<p><a href="/signup">Sign Up</a></p></div>`)
-            res.write(`<div><p><a href="/">HOME</a></p></div>`)
-            res.end()
-        } else {
-            crypto.randomBytes(64, (err, buf) => {
-                if (err) throw err;
-                let salt = buf.toString('base64')
-                crypto.pbkdf2(password, salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, key) => {
-                    derivedKey = key.toString('base64')
-                    db.query(`INSERT INTO ${status} (NumId, Name, UserId, Password, created, salt) VALUES (?, ?, ?, ?, NOW(), ?)`, [numId, name, userId, derivedKey, salt], (err, result) => {
-                        if (err) throw err
-                        res.writeHead('200', { 'Content-Type' : 'text/html; charset=utf8'})
-                        res.write(`<p>${name}(${userId})님, 회원가입을 환영합니다!</p>`)
-                        res.write(`<p><a href="/">HOME</a></p>`)
-                        res.write(`<p><a href="login">Login</a></p>`)
-                        res.end()
-                    })
-                })
-            })
-        }
-    })
-
-    /*if (status === 'student') {
-        
-    } else if (status === 'faculty') {
-        db.query(`SELECT * FROM Faculty where NumId=? || UserId=?`, [numId, userId], (err, results) => {
-            if (err) throw err;
-            if (results[0]) {       // 이미 존재하는 사번 또는 아이디
-                res.writeHead('200', { 'Content-Type' : 'text/html; charset=utf8'})
-                res.write(`입력하신 사번 또는 아이디로 가입된 계정이 이미 존재합니다.`)
-                res.write(`<div><p><a href="/login">Login</a></p></div>`)
-                res.write(`<div<p><a href="/signup">Sign Up</a></p></div>`)
-                res.write(`<div><p><a href="/">HOME</a></p></div>`)
-                res.end()
-            } else {
-                crypto.randomBytes(64, (err, buf) => {
-                    if (err) throw err;
-                    let salt = buf.toString('base64')
-                    crypto.pbkdf2(password, salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, key) => {
-                        derivedKey = key.toString('base64')
-                        db.query(`INSERT INTO Faculty (NumId, Name, UserId, Password, created, salt) VALUES (?, ?, ?, ?, NOW(), ?)`, [numId, name, userId, derivedKey, salt], (err, result) => {
-                            if (err) throw err
-                            res.writeHead('200', { 'Content-Type' : 'text/html; charset=utf8'})
-                            res.write(`<p>${name}(${userId})님, 회원가입을 환영합니다!</p>`)
-                            res.write(`<p><a href="/">HOME</a></p>`)
-                            res.write(`<p><a href="login">Login</a></p>`)
-                            res.end()
-                        })
-                    })
+    const DataCheck=()=>{
+        return new Promise((resolve, reject)=>{
+            if(!status || !numId || !name || !userId || !password){
+                return reject({
+                    code:'request_body_error',
+                    message:'Request body is undefined'
                 })
             }
+            else{
+                return resolve()
+            }
         })
-    }*/
+    }
+
+    const UserCheck=async ()=>{
+        try{
+            const connection=await pool.getConnection(async conn => conn)
+            try{
+                const [rows]=await connection.query(`SELECT * FROM USER WHERE NUMID=? || USERID=?`,[numId,userId])
+                connection.release()
+                if(rows[0]){
+                    return Promise.reject({
+                        code:'user_already_exists',
+                        message:'User already exists'
+                    })
+                }
+                else{
+                    return Promise.resolve()
+                }
+            }
+            catch (err) {
+                console.error(err)
+                return Promise.reject({
+                    code:'database_query_error',
+                    message:'database_query_error'
+                })
+            }
+        }
+        catch{
+            return Promise.reject({
+                code:'database_connection_error',
+                message:'Failed to connect database'
+            })
+        }
+    }
+
+    const Create=async ()=>{
+        crypto.randomBytes(64,(err,buf)=>{
+            if (err)
+                throw err
+            let salt = buf.toString('base64')
+            let key=crypto.pbkdf2Sync(password, salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512')
+            let derivedKey=key.toString('base64');
+            const doCreate=async ()=>{
+                try{
+                    const connection=await pool.getConnection(async conn=>conn)
+                    try{
+                        const result = await connection.query(`INSERT INTO USER (NUMID,NAME,USERID,PASSWORD,CREATED,SALT,STATUS) VALUES (?,?,?,?,NOW(),?,?)`,[numId,name,userId,derivedKey,salt,status])
+                        connection.release()
+                        return Promise.resolve()
+                    }
+                    catch (err){
+                        console.error(err)
+                        return Promise.reject({
+                            code:'database_error',
+                            message:'Database error'
+                        })
+                    }
+                }
+                catch{
+                    return Promise.reject({
+                        code:'database_error',
+                        message:'Database error'
+                    })
+                }
+            }
+            doCreate()
+        })
+    }
+    DataCheck()
+        .then(UserCheck)
+        .then(Create)
+        .then(()=>{
+            res.redirect('/index.html')
+        })
+        .catch((err)=>{
+            console.log(err)
+            res.status(500).json(err|err.message)
+        })
 }

@@ -5,7 +5,7 @@ const login = require('./login')
 const signup = require('./signup')
 
 router.post('/everytime', everytime.Everytime )
-router.post('/login_process', login.Login)
-router.post('/signup_process', signup.Signup)
+router.post('/login', login.Login)
+router.post('/signup', signup.Signup)
 
 module.exports=router
