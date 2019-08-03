@@ -35,14 +35,14 @@ exports.Login = (req, res) => {
                 return Promise.resolve(rows)
             }
             catch (err) {
-                console.error(error)
+                console.error(err)
                 return Promise.reject({
                     code:'no_user',
                     message:'Cannot find user'
                 })
             }
         }
-        catch{
+        catch (err) {
             return Promise.reject({
                 code:'database_connection_error',
                 message:'Failed to connect database'
@@ -72,7 +72,7 @@ exports.Login = (req, res) => {
         .then(PWCheck)
         .then(()=>{
             req.session.sid=userId
-            res.status(200).json({userId:userId})
+            res.status(200).redirect('/main.html')
         })
         .catch((err)=>{
             console.log(err)

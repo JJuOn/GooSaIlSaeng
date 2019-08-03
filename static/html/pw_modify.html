@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>비밀번호 변경</title>
+
+</head>
+
+<body>
+    <div class="container">
+
+        <form action="/api/user/modify" method="POST">
+
+            <div>
+                <label>현재 비밀번호</label>
+                <input type="password" name="cur_password" placeholder="현재 비밀번호" required>
+            </div>
+            <div>
+                <label>새 비밀번호</label>
+                <input type="password" name="new_password" placeholder="새 비밀번호" required>
+            </div>
+            <div>    
+                <label>비밀번호 확인</label>
+                <input type="password" name="password_chk" placeholder="비밀번호 확인" required>
+            </div>
+
+            <label>
+                <input type="submit" value="변경하기">
+            </label>
+        </form>
+
+</body>
+
+</html>
