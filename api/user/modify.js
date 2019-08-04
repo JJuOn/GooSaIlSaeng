@@ -20,10 +20,10 @@ let modify = {}
 } */
 
 modify.Modify = (req, res) => {
-    if (!req.session.sid) {
+    if (!req.session.user) {
         res.redirect('/')
     } else {
-        const sid = req.session.sid
+        const userid = req.session.user.userid
 
         const cur_pw = req.body.cur_password
         const new_pw = req.body.new_password
@@ -46,7 +46,7 @@ modify.Modify = (req, res) => {
             try {
                 const connection = await pool.getConnection(async conn => conn)
                 try {
-                    const [rows] = await connection.query(`SELECT * FROM USER WHERE UserId = ?`, [sid])
+                    const [rows] = await connection.query(`SELECT * FROM USER WHERE UserId = ?`, [userid])
                     connection.release()
                     if(!rows[0]){
                         return Promise.reject({
@@ -69,24 +69,32 @@ modify.Modify = (req, res) => {
             }
         }
     
-        const PWCheck = async (rows) => {
+        const PWCheck = (rows) => {
             const cur_encrypted_pw = rows[0].password
             const cur_salt = rows[0].salt
 
-            crypto.pbkdf2(cur_pw, cur_salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, derivedKey) => {
-                if (err) throw err
-                if (derivedKey.toString('base64') === cur_encrypted_pw) {
-                    return Promise.resolve()
-                } else {
-                    return Promise.reject({
-                        code:'cur_password_error',
-                        message:'Current Password is wrong',
+            return new Promise((resolve, reject) => {
+                try {
+                    crypto.pbkdf2(cur_pw, cur_salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, derivedKey) => {
+                        if (err) throw err
+
+                        if (derivedKey.toString('base64') === cur_encrypted_pw) {
+                            resolve()
+                        } else {
+                            reject({
+                                code:'cur_password_error',
+                                message:'Current Password is wrong',
+                            })
+                        }
                     })
+                } catch (err) {
+                    console.log(err)
+                    reject(err)
                 }
             })
         }
 
-        const EqualCheck = async () => {
+        const EqualCheck = () => {
             if (new_pw !== chk_pw) {
                 return Promise.reject({
                     code:'password_error',
@@ -109,7 +117,7 @@ modify.Modify = (req, res) => {
                     try {
                         const connection = await pool.getConnection(async conn => conn)
                         try {
-                            const result = await connection.query(`UPDATE user SET password = ?, salt = ? WHERE userid = ?`, [new_derived, new_salt, sid])
+                            const result = await connection.query(`UPDATE user SET password = ?, salt = ? WHERE userid = ?`, [new_derived, new_salt, userid])
                             connection.release()
                             return Promise.resolve()
                         } catch (err){
@@ -152,7 +160,10 @@ modify.Modify = (req, res) => {
         .catch((err) => {
             console.log(err)
 
-            res.status(500).json(err | err.message)
+            res.status(500).send(`
+            <p>${err.message || err}</p>
+            <p><a href='/login.html'/>다시 변경하기</p>
+            `)
         })
     }
 }

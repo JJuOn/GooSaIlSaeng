@@ -1,16 +1,16 @@
 const pool = require('../../pool')
 
 exports.Mypage = (req, res) => {
-    if (!req.session.sid) {
+    if (!req.session.user) {
         res.redirect('/')
     } else {
-        const sid = req.session.sid
+        const userid = req.session.user.userid
 
         const UserCheck = async () => {
             try {
                 const connection = await pool.getConnection(async conn => conn)
                 try {
-                    const [rows] = await connection.query(`SELECT * FROM USER WHERE UserId = ?`, [sid])
+                    const [rows] = await connection.query(`SELECT * FROM USER WHERE UserId = ?`, [userid])
                     connection.release()
                     if(!rows[0]){
                         return Promise.reject({
@@ -35,14 +35,14 @@ exports.Mypage = (req, res) => {
     
         UserCheck()
         .then((rows) => {
-            req.session.sid = sid
+            //req.session.sid = sid
             
             const status = rows[0].status
             const name = rows[0].name
             const numid = rows[0].numid
 
             res.render('mypage.ejs', {
-                sid:sid,
+                userid:userid,
                 status:status,
                 numid:numid,
                 name:name,
