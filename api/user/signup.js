@@ -7,6 +7,7 @@ exports.Signup = (req, res) => {
     const name = req.body.name
     const userId = req.body.userid
     const password = req.body.password
+    const chk_pw = req.body.password_chk
 
     const DataCheck=()=>{
         return new Promise((resolve, reject)=>{
@@ -54,6 +55,17 @@ exports.Signup = (req, res) => {
         }
     }
 
+    const EqualCheck = () => {
+        if (password !== chk_pw) {
+            return Promise.reject({
+                code:'password_error',
+                message:'Password Check Mismatch',
+            })
+        } else {
+            return Promise.resolve()
+        }
+    }
+
     const Create=async ()=>{
         crypto.randomBytes(64,(err,buf)=>{
             if (err)
@@ -89,12 +101,17 @@ exports.Signup = (req, res) => {
     }
     DataCheck()
         .then(UserCheck)
+        .then(EqualCheck)
         .then(Create)
         .then(()=>{
             res.redirect('/index.html')
         })
         .catch((err)=>{
             console.log(err)
-            res.status(500).json(err|err.message)
+
+            res.status(500).send(`
+            <p>${err.message || err}</p>
+            <p><a href='/signup.html'/>회원가입</p>
+            `)
         })
 }
