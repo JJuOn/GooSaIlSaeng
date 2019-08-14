@@ -87,7 +87,7 @@ exports.Login = (req, res) => {
                 status: user.status,
             }
 
-            res.status(200).redirect('/main.html')
+            res.redirect('/main')
         })
         .catch((err)=>{
             console.log(err)
@@ -95,7 +95,7 @@ exports.Login = (req, res) => {
             //res.status(500).json(err.message || err)
             res.status(500).send(`
             <p>${err.message || err}</p>
-            <p><a href='/login.html'/>다시 로그인하기</p>
+            <p><a href='/login'/>다시 로그인하기</p>
             `)
         })
 }
