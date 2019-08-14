@@ -35,14 +35,14 @@ exports.Login = (req, res) => {
                 return Promise.resolve(rows)
             }
             catch (err) {
-                console.error(error)
+                console.error(err)
                 return Promise.reject({
                     code:'no_user',
                     message:'Cannot find user'
                 })
             }
         }
-        catch{
+        catch (err) {
             return Promise.reject({
                 code:'database_connection_error',
                 message:'Failed to connect database'
@@ -50,19 +50,27 @@ exports.Login = (req, res) => {
         }
     }
 
-    const PWCheck=(rows)=>{
+    const PWCheck = (rows) => {
         let user = rows[0]
-        crypto.pbkdf2(password, user.salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, derivedKey)=>{
-            if (err)
-                throw err
-            if (derivedKey.toString('base64')===user.Password){
-                return Promise.resolve()
-            }
-            else{
-                return Promise.reject({
-                    code:'password_error',
-                    message:'Password is wrong',
+
+        return new Promise((resolve, reject) => {
+            try {
+                crypto.pbkdf2(password, user.salt, Number(process.env.CRYPTO_ITERATION), 64, 'sha512', (err, derivedKey) => {
+                    if (err) throw err
+                    
+                    if (derivedKey.toString('base64')===user.password){
+                        resolve(user)
+                    }
+                    else{
+                        reject({
+                            code:'password_error',
+                            message:'Password is wrong',
+                        })
+                    }
                 })
+            } catch (err) {
+                console.log(err)
+                reject(err)
             }
         })
     }
@@ -70,13 +78,24 @@ exports.Login = (req, res) => {
     DataCheck()
         .then(UserCheck)
         .then(PWCheck)
-        .then(()=>{
-            req.session.sid=userId
-            res.status(200).json({userId:userId})
+        .then((user)=>{
+            // req.session.sid=userId
+            req.session.user = {
+                userid: userId,
+                numid: user.numid,
+                name: user.name,
+                status: user.status,
+            }
+
+            res.status(200).redirect('/main.html')
         })
         .catch((err)=>{
             console.log(err)
 
-            res.status(500).json(err|err.message)
+            //res.status(500).json(err.message || err)
+            res.status(500).send(`
+            <p>${err.message || err}</p>
+            <p><a href='/login.html'/>다시 로그인하기</p>
+            `)
         })
 }

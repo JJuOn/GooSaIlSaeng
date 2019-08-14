@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Page</title>
+
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>My Page</h1>
+
+        <div>신분 : <%= status %> </div>
+        <div >
+            <% if (status === 'Student') { %>
+                <label >학번 : <%= numid %></label>
+            <% } %>
+            <% if (status === 'Faculty') { %>
+                <label >사번 : <%= numid %></label>
+            <% } %>
+        </div>
+        <div >
+            <label >이름 : <%= name %></label>
+        </div>
+        <div >
+            <label>아이디 : <%= userid %> </label>
+        </div>
+
+            <p><a href="/main.html">HOME</a></p>
+            <p><a href="/pw_modify.html">비밀번호 변경</a></p>
+        </div>
+
+</body>
+
+</html>
