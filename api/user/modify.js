@@ -153,7 +153,7 @@ modify.Modify = (req, res) => {
 
                 <body>
                     <div><h3>변경되었습니다.</h3></div>
-                    <p><a href="/main.html">HOME</a></p>
+                    <p><a href="/main">HOME</a></p>
                 </body>
             `)
         })
@@ -162,7 +162,7 @@ modify.Modify = (req, res) => {
 
             res.status(500).send(`
             <p>${err.message || err}</p>
-            <p><a href='/login.html'/>다시 변경하기</p>
+            <p><a href='/login'/>다시 변경하기</p>
             `)
         })
     }
