@@ -1,14 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko-kr">
+
 <head>
     <meta charset="UTF-8">
-    <title>에브리타임 연동</title>
+    <title>Everytime Auth Page</title>
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../css/login.css">
 </head>
+
 <body>
-    <form action="/api/user/everytime" method="post">
-        <input type="text" name="etId">
-        <input type="password" name="etPassword">
-        <input type="submit">
-    </form>
+    <div class="container">
+        <div class="row">
+
+            <div class="sign-box">
+                    <img class='logo' src="../img/everytime.jpg" alt="">
+                    <p>"본 서비스를 이용하시려면 에브리타임 연동이 필요합니다."</p>
+                <form action="/api/user/everytime" method="POST">
+
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="etId" placeholder="에브리타임 ID">
+                    </div>
+                    <div class="form-group">
+
+                        <input type="password" class="form-control" name="etPassword" placeholder="Password">
+                    </div>
+                    <label>
+                        <input class="btn-login-et" type="submit" value="로그인">
+                    </label>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
 </body>
+
 </html>
